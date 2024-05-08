@@ -12,7 +12,7 @@ export class MoviesViewComponent implements OnInit {
 
   ngOnInit(): void {
     this.moveiService.getMovies().subscribe({
-      next: (v) => (this.movieData = v),
+      next: (v: any) => (this.movieData = v.movies),
       error: (e) => console.error(e),
     });
   }
