@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MoviesService } from 'src/app/shared/service/movies.service';
+import { IMovie, IMovies } from '../shared/interface/movie.interface';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'app-movies-view',
@@ -7,12 +9,22 @@ import { MoviesService } from 'src/app/shared/service/movies.service';
   styleUrls: ['./movies-view.component.scss'],
 })
 export class MoviesViewComponent implements OnInit {
-  movieData: any;
+  movieData!: IMovie[];
   constructor(private moveiService: MoviesService) {}
 
   ngOnInit(): void {
     this.moveiService.getMovies().subscribe({
-      next: (v: any) => (this.movieData = v.movies),
+      next: (v: IMovies) => {
+        console.log(v);
+
+        if (v) {
+          this.movieData = v.movies;
+        } else {
+          console.error(
+            'Invalid data format: Movies data is missing or incorrect'
+          );
+        }
+      },
       error: (e) => console.error(e),
     });
   }

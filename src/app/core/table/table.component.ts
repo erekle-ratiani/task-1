@@ -9,6 +9,7 @@ import {
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'; // Import BrowserAnimationsModule
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { IMovie } from 'src/app/movies/shared/interface/movie.interface';
 @Component({
   selector: 'app-table',
   standalone: true,
@@ -18,8 +19,8 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 })
 export class TableComponent implements AfterViewInit, OnInit, OnChanges {
   displayedColumns: string[] = [];
-  @Input('dataSource') ELEMENT_DATA!: any;
-  dataSource = new MatTableDataSource<any>(this.ELEMENT_DATA);
+  @Input('dataSource') ELEMENT_DATA!: IMovie[];
+  dataSource = new MatTableDataSource<IMovie>(this.ELEMENT_DATA);
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   ngOnInit(): void {
     console.log(this.ELEMENT_DATA);
@@ -31,7 +32,7 @@ export class TableComponent implements AfterViewInit, OnInit, OnChanges {
     });
     console.log(this.displayedColumns, this.ELEMENT_DATA);
 
-    this.dataSource = new MatTableDataSource<any>(this.ELEMENT_DATA);
+    this.dataSource = new MatTableDataSource<IMovie>(this.ELEMENT_DATA);
   }
   ngAfterViewInit() {
     console.log(this.ELEMENT_DATA);
