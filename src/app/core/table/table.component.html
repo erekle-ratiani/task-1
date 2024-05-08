@@ -1,5 +1,5 @@
-<div *ngIf="ELEMENT_DATA" class="mat-elevation-z8">
-  <table mat-table [dataSource]="ELEMENT_DATA">
+<div class="mat-elevation-z8">
+  <table *ngIf="ELEMENT_DATA" mat-table [dataSource]="ELEMENT_DATA">
     <!-- Position Column -->
     <ng-container *ngFor="let col of displayedColumns" matColumnDef="{{ col }}">
       <th mat-header-cell *matHeaderCellDef>{{ col }}</th>
@@ -9,7 +9,6 @@
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
   </table>
-
   <mat-paginator
     [pageSizeOptions]="[5, 10, 20]"
     showFirstLastButtons
