@@ -1,7 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { MoviesService } from 'src/app/shared/service/movies.service';
 import { IMovie, IMovies } from '../shared/interface/movie.interface';
-import { map } from 'rxjs';
+import {
+  BehaviorSubject,
+  Observable,
+  Subject,
+  Subscription,
+  map,
+  of,
+} from 'rxjs';
 
 @Component({
   selector: 'app-movies-view',
@@ -9,32 +16,16 @@ import { map } from 'rxjs';
   styleUrls: ['./movies-view.component.scss'],
 })
 export class MoviesViewComponent implements OnInit {
-  movieData!: IMovie[];
+  movieData!: Observable<IMovie[]>;
   constructor(private moveiService: MoviesService) {}
 
   ngOnInit(): void {
-    this.moveiService
-      .getMovies()
-      .pipe(
-        map((movies) => {
-          return movies.map((movie) => {
-            return { ...movie, id: Number(movie.id) }; // Convert the ID to a number
-          });
-        })
-      )
-      .subscribe({
-        next: (v: IMovie[]) => {
-          console.log(v);
-
-          if (v) {
-            this.movieData = v;
-          } else {
-            console.error(
-              'Invalid data format: Movies data is missing or incorrect'
-            );
-          }
-        },
-        error: (e) => console.error(e),
-      });
+    this.movieData = this.moveiService.getMovies().pipe(
+      map((movies) => {
+        return movies.map((movie) => {
+          return { ...movie, id: Number(movie.id) }; // Convert the ID to a number
+        });
+      })
+    );
   }
 }

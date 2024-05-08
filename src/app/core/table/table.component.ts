@@ -19,28 +19,26 @@ import { IMovie } from 'src/app/movies/shared/interface/movie.interface';
 })
 export class TableComponent implements AfterViewInit, OnInit, OnChanges {
   displayedColumns: string[] = [];
-  @Input() ELEMENT_DATA!: IMovie[];
-  dataSource = new MatTableDataSource<IMovie>(this.ELEMENT_DATA);
+  @Input() ELEMENT_DATA: IMovie[] | null = [];
+  dataSource!: MatTableDataSource<IMovie>;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   ngOnInit(): void {
     console.log(this.ELEMENT_DATA);
   }
   ngOnChanges(): void {
     if (!this.ELEMENT_DATA) return;
-    console.log(this.displayedColumns, this.ELEMENT_DATA);
     Object.keys(this.ELEMENT_DATA[0]).forEach((key) => {
       this.displayedColumns.push(key);
     });
     console.log(this.displayedColumns);
-
     this.dataSource = new MatTableDataSource<IMovie>(this.ELEMENT_DATA);
+
+    this.dataSource.paginator = this.paginator;
   }
   ngAfterViewInit() {
     console.log(this.ELEMENT_DATA);
-    this.dataSource.paginator = this.paginator;
   }
   ngAfterContentInit() {
     console.log(this.ELEMENT_DATA);
-    this.dataSource.paginator = this.paginator;
   }
 }
