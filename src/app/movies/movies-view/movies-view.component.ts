@@ -26,8 +26,8 @@ export class MoviesViewComponent implements OnInit {
         next: (v: IMovie[]) => {
           console.log(v);
 
-          this.movieData = v;
           if (v) {
+            this.movieData = v;
           } else {
             console.error(
               'Invalid data format: Movies data is missing or incorrect'
