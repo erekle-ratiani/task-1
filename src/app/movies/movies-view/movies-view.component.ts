@@ -13,19 +13,28 @@ export class MoviesViewComponent implements OnInit {
   constructor(private moveiService: MoviesService) {}
 
   ngOnInit(): void {
-    this.moveiService.getMovies().subscribe({
-      next: (v: any) => {
-        console.log(v);
+    this.moveiService
+      .getMovies()
+      .pipe(
+        map((movies) => {
+          return movies.map((movie) => {
+            return { ...movie, id: Number(movie.id) }; // Convert the ID to a number
+          });
+        })
+      )
+      .subscribe({
+        next: (v: IMovie[]) => {
+          console.log(v);
 
-        this.movieData = v;
-        if (v) {
-        } else {
-          console.error(
-            'Invalid data format: Movies data is missing or incorrect'
-          );
-        }
-      },
-      error: (e) => console.error(e),
-    });
+          this.movieData = v;
+          if (v) {
+          } else {
+            console.error(
+              'Invalid data format: Movies data is missing or incorrect'
+            );
+          }
+        },
+        error: (e) => console.error(e),
+      });
   }
 }
