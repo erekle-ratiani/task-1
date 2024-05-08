@@ -19,19 +19,23 @@ import { IMovie } from 'src/app/movies/shared/interface/movie.interface';
 })
 export class TableComponent implements AfterViewInit, OnInit, OnChanges {
   displayedColumns: string[] = [];
-  @Input('dataSource') ELEMENT_DATA!: IMovie[];
-  dataSource = new MatTableDataSource<IMovie>(this.ELEMENT_DATA);
+  @Input() ELEMENT_DATA!: IMovie[];
+  dataSource = new MatTableDataSource<IMovie>([
+    {
+      id: 1,
+      title: 'Laughter in the Shadows',
+      rating: 5,
+      genre: ['comedy', 'horror', 'mystery'],
+    },
+  ]);
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   ngOnInit(): void {
     console.log(this.ELEMENT_DATA);
   }
   ngOnChanges(): void {
     if (!this.ELEMENT_DATA) return;
-    Object.keys(this.ELEMENT_DATA[0]).forEach((key) => {
-      this.displayedColumns.push(key);
-    });
     console.log(this.displayedColumns, this.ELEMENT_DATA);
-
+    this.displayedColumns = ['id', 'title', 'rating', 'genre'];
     this.dataSource = new MatTableDataSource<IMovie>(this.ELEMENT_DATA);
   }
   ngAfterViewInit() {
@@ -42,11 +46,4 @@ export class TableComponent implements AfterViewInit, OnInit, OnChanges {
     console.log(this.ELEMENT_DATA);
     this.dataSource.paginator = this.paginator;
   }
-}
-
-export interface PeriodicElement {
-  name: string;
-  position: number;
-  weight: number;
-  symbol: string;
 }

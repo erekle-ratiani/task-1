@@ -14,11 +14,11 @@ export class MoviesViewComponent implements OnInit {
 
   ngOnInit(): void {
     this.moveiService.getMovies().subscribe({
-      next: (v: IMovies) => {
+      next: (v: any) => {
         console.log(v);
 
+        this.movieData = v;
         if (v) {
-          this.movieData = v.movies;
         } else {
           console.error(
             'Invalid data format: Movies data is missing or incorrect'
