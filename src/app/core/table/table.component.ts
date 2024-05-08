@@ -28,7 +28,11 @@ export class TableComponent implements AfterViewInit, OnInit, OnChanges {
   ngOnChanges(): void {
     if (!this.ELEMENT_DATA) return;
     console.log(this.displayedColumns, this.ELEMENT_DATA);
-    this.displayedColumns = ['id', 'title', 'rating', 'genre'];
+    Object.keys(this.ELEMENT_DATA[0]).forEach((key) => {
+      this.displayedColumns.push(key);
+    });
+    console.log(this.displayedColumns);
+
     this.dataSource = new MatTableDataSource<IMovie>(this.ELEMENT_DATA);
   }
   ngAfterViewInit() {
