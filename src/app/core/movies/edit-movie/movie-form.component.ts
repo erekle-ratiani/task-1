@@ -42,10 +42,13 @@ export class MovieFormComponent implements OnInit, OnDestroy {
     const dto = { ...this.movieForm.value, id };
     console.log(dto);
 
-    this.movieService.addMovie(dto).subscribe({
-      next: (val) => this.router.navigateByUrl('/'),
-      error: (err) => console.log(err.message),
-    });
+    this.movieService
+      .addMovie(dto)
+      .pipe(takeUntil(this.temp$))
+      .subscribe({
+        next: (val) => this.router.navigateByUrl('/'),
+        error: (err) => console.log(err.message),
+      });
     console.log(dto);
   }
   onEditMovie() {
@@ -53,10 +56,13 @@ export class MovieFormComponent implements OnInit, OnDestroy {
     const dto = { ...this.movieForm.value, id: this.movieId };
     console.log(dto);
 
-    this.movieService.updateMovie(dto, this.movieId).subscribe({
-      next: (val) => this.router.navigateByUrl('/'),
-      error: (err) => console.log(err.message),
-    });
+    this.movieService
+      .updateMovie(dto, this.movieId)
+      .pipe(takeUntil(this.temp$))
+      .subscribe({
+        next: (val) => this.router.navigateByUrl('/'),
+        error: (err) => console.log(err.message),
+      });
     console.log(dto);
   }
 
