@@ -4,6 +4,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { IMovie } from 'src/app/movies/shared/interface/movie.interface';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-table',
   standalone: true,
@@ -21,7 +22,7 @@ export class TableComponent implements OnChanges {
   @Input() ELEMENT_DATA: IMovie[] | null = [];
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   dataSource!: MatTableDataSource<IMovie>;
-
+  constructor(private router: Router) {}
   ngOnChanges(): void {
     if (!this.ELEMENT_DATA) return;
     Object.keys(this.ELEMENT_DATA[0]).forEach((key) => {
@@ -30,5 +31,19 @@ export class TableComponent implements OnChanges {
     this.dataSource = new MatTableDataSource<IMovie>(this.ELEMENT_DATA);
     this.dataSource.paginator = this.paginator;
     console.log(this.paginator);
+  }
+  editElment(id: number) {
+    this.router.navigate([`/form/${id}`], {
+      queryParams: {
+        edit: 'true',
+      },
+    });
+  }
+  addMovie() {
+    this.router.navigate([`/form/new`], {
+      queryParams: {
+        create: 'true',
+      },
+    });
   }
 }

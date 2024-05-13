@@ -6,7 +6,7 @@ import { MovieFormComponent } from './core/movies/edit-movie/movie-form.componen
 const routes: Routes = [
   { path: '', redirectTo: '/movies', pathMatch: 'full' },
   { path: 'movies', component: MoviesViewComponent },
-  { path: 'form', component: MovieFormComponent },
+  { path: 'form/:id', component: MovieFormComponent },
 ];
 
 @NgModule({
