@@ -19,7 +19,7 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MoviesService } from 'src/app/shared/service/movies.service';
-import { Subject, catchError, switchMap, takeUntil } from 'rxjs';
+import { Subject, catchError, of, switchMap, takeUntil } from 'rxjs';
 import { IMovie } from 'src/app/movies/shared/interface/movie.interface';
 
 @Component({
@@ -30,72 +30,40 @@ import { IMovie } from 'src/app/movies/shared/interface/movie.interface';
   styleUrls: ['./edit-movie.component.scss'],
 })
 export class MovieFormComponent implements OnInit, OnDestroy {
-  constructor(
-    private formBuilder: FormBuilder,
-    private route: ActivatedRoute,
-    private movieService: MoviesService,
-    private router: Router
-  ) {}
-  onCreateMovie() {
-    const id = String(Math.random());
-    if (!this.movieForm.valid) return;
-    const dto = { ...this.movieForm.value, id };
-    console.log(dto);
-
-    this.movieService
-      .addMovie(dto)
-      .pipe(takeUntil(this.temp$))
-      .subscribe({
-        next: (val) => this.router.navigateByUrl('/'),
-        error: (err) => console.log(err.message),
-      });
-    console.log(dto);
-  }
-  onEditMovie() {
-    if (!this.movieForm.valid) return;
-    const dto = { ...this.movieForm.value, id: this.movieId };
-    console.log(dto);
-
-    this.movieService
-      .updateMovie(dto, this.movieId)
-      .pipe(takeUntil(this.temp$))
-      .subscribe({
-        next: (val) => this.router.navigateByUrl('/'),
-        error: (err) => console.log(err.message),
-      });
-    console.log(dto);
-  }
-
   temp$ = new Subject<void>();
   currentMovie!: IMovie;
   movieId!: number;
   movieForm!: FormGroup;
   edit: boolean = false;
   create: boolean = false;
-  ngOnInit(): void {
-    this.movieForm = this.formBuilder.group({
-      title: [null, [Validators.required]],
-      rating: [null, [Validators.required]],
-      genre: new FormArray([new FormControl(null, Validators.required)]),
-    });
-    console.log(this.movieForm);
+  constructor(
+    private formBuilder: FormBuilder,
+    private route: ActivatedRoute,
+    private movieService: MoviesService,
+    private router: Router
+  ) {}
+   ///////lifecycle hooks
+   ngOnInit(): void {
+    this.initMoviesForm();
     this.route.params
       .pipe(
+        catchError((err) => {
+          ///////////////////if this is catching why am i still getting error in console before log statement  where to put catch//////////
+          return of();
+        }),
         switchMap((val) => {
-          console.log(parseFloat(val['id']));
+          if (!val) return of();
           this.movieId = parseFloat(val['id']);
           return this.movieService.getMovie(parseFloat(val['id'])).pipe(
             catchError((err) => {
               ///////////////////if this is catching why am i still getting error in console before log statement  where to put catch //////////
-              console.log(err);
-              return err;
-            }),
-            catchError((err) => {
-              ///////////////////if this is catching why am i still getting error in console before log statement  where to put catch//////////
-              console.log(err);
               return err;
             })
           );
+        }),
+        catchError((err) => {
+          ///////////////////if this is catching why am i still getting error in console before log statement  where to put catch//////////
+          return of();
         }),
         takeUntil(this.temp$)
       )
@@ -104,17 +72,7 @@ export class MovieFormComponent implements OnInit, OnDestroy {
         // next: (movie:IMovie) => {this.currentMovie = movie
         next: (movie: any) => {
           this.currentMovie = movie;
-          const genreArray = this.movieForm.get('genre') as FormArray;
-          genreArray.clear();
-
-          // Populate genre FormArray with movie.genre data
-          movie.genre.forEach((genre: string[]) => {
-            genreArray.push(new FormControl(genre, Validators.required));
-          });
-          this.movieForm.patchValue({
-            title: movie.title,
-            rating: movie.rating,
-          });
+          this.populateMovieFOrm(movie);
         },
         error: (err) => console.log(err.message),
       });
@@ -132,13 +90,40 @@ export class MovieFormComponent implements OnInit, OnDestroy {
     // }
     this.route.queryParams.subscribe({
       next: (query) => {
-        console.log(query);
         query['edit'] && (this.edit = true);
         query['create'] && (this.create = true);
       },
       error: (err) => {
         console.log(err);
       },
+    });
+  }
+  ngOnDestroy(): void {
+    this.temp$.next();
+  }
+  /////// lifcycle hooks
+
+  
+  ////////form group
+ 
+  populateMovieFOrm(movie: IMovie) {
+    const genreArray = this.movieForm.get('genre') as FormArray;
+    genreArray.clear();
+
+    // Populate genre FormArray with movie.genre data
+    movie.genre.forEach((genre: string) => {
+      genreArray.push(new FormControl(genre, Validators.required));
+    });
+    this.movieForm.patchValue({
+      title: movie.title,
+      rating: movie.rating,
+    });
+  }
+  initMoviesForm() {
+    this.movieForm = this.formBuilder.group({
+      title: [null, [Validators.required]],
+      rating: [null, [Validators.required]],
+      genre: new FormArray([new FormControl(null, Validators.required)]),
     });
   }
   ////////form array
@@ -158,7 +143,39 @@ export class MovieFormComponent implements OnInit, OnDestroy {
     return this.formArray.controls as FormControl[];
   }
   ////////form array
-  ngOnDestroy(): void {
-    this.temp$.next();
+  ////////edit
+
+  onEditMovie() {
+    if (!this.movieForm.valid) return;
+    const dto = { ...this.movieForm.value, id: this.movieId };
+
+    this.movieService
+      .updateMovie(dto, this.movieId)
+      .pipe(takeUntil(this.temp$))
+      .subscribe({
+        next: (val) => this.router.navigateByUrl('/'),
+        error: (err) => console.log(err.message),
+      });
   }
+  ////////edit
+  ////////create
+  onCreateMovie() {
+    const id = String(Math.random());
+    if (!this.movieForm.valid) return;
+    const dto = { ...this.movieForm.value, id };
+
+    this.movieService
+      .addMovie(dto)
+      .pipe(takeUntil(this.temp$))
+      .subscribe({
+        next: (val) => this.router.navigateByUrl('/'),
+        error: (err) => console.log(err.message),
+      });
+  }
+  ////////create
+  ////////form group
+  ///////utility
+  ///////utility
+ 
+ 
 }

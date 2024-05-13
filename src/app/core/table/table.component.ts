@@ -25,12 +25,10 @@ export class TableComponent implements OnChanges {
   constructor(private router: Router) {}
   ngOnChanges(): void {
     if (!this.ELEMENT_DATA) return;
-    Object.keys(this.ELEMENT_DATA[0]).forEach((key) => {
-      this.displayedColumns.push(key);
-    });
+
+    this.populateTableCollumns(this.ELEMENT_DATA);
     this.dataSource = new MatTableDataSource<IMovie>(this.ELEMENT_DATA);
     this.dataSource.paginator = this.paginator;
-    console.log(this.paginator);
   }
   editElment(id: number) {
     this.router.navigate([`/form/${id}`], {
@@ -44,6 +42,11 @@ export class TableComponent implements OnChanges {
       queryParams: {
         create: 'true',
       },
+    });
+  }
+  populateTableCollumns(ELEMENT_DATA: {}[]) {
+    Object.keys(ELEMENT_DATA[0]).forEach((key) => {
+      this.displayedColumns.push(key);
     });
   }
 }
